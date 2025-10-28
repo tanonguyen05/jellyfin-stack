@@ -23,3 +23,15 @@ services:
       - 7359:7359/udp #optional
       - 1900:1900/udp #optional
     restart: unless-stopped
+
+############################
+# CLOUDFLARED
+############################
+
+  jelly-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: jelly-tunnel
+    environment:
+      - TZ=America/New_York
+    command: tunnel --no-autoupdate run --token eyJhIjoiODA3NzcxNjBhOTEwMDFhNWVkMGZkMDQyMTA3NWU3YTQiLCJ0IjoiNjhjNzI2YjctNGQ5Mi00MDk2LTg3ZmYtNzM4YjkxOGJiMGUwIiwicyI6Ik5HWmlNRFV3TTJVdE9UQm1NQzAwWXpOa0xXSXpNakF0T0dKaE1EUTBPREJoWW1NMSJ9
+    restart: unless-stopped
