@@ -1,8 +1,4 @@
 ---
-networks:
-  jellyfin-net:
-    driver: bridge
-
 services:
 
 ############################
@@ -17,31 +13,43 @@ services:
       - PGID=1000
       - TZ=America/New_York
     volumes:
-      - /configs/jellyfin:/config
-      - /share/media/arr/sonarr/tvseries:/data/tvshows
-      - /share/media/arr/sonarr/anime:/data/anime
-      - /share/media/arr/radarr/movies:/data/movies
+      - ./config:/config
+      - /data:/data
     ports:
       - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - 7359:7359/udp #Service Discovery
+      - 1900:1900/udp #Client Discovery
     devices:
       - /dev/dri:/dev/dri
-    networks:
-      - jellyfin-net
+    restart: unless-stopped
+
+############################
+# JELLYSEERR	
+############################
+
+  jellyseerr:
+    container_name: jellyseerr
+    image: fallenbagel/jellyseerr:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./jellyseerr:/app/config
+    ports:
+      - 5055:5055
     restart: unless-stopped
 
 ############################
 # CLOUDFLARED
 ############################
 
-  jelly-tunnel:
+  media-tunnel:
     image: cloudflare/cloudflared:latest
-    container_name: jelly-tunnel
+    container_name: media-tunnel
     environment:
       - TZ=America/New_York
-    command: tunnel --no-autoupdate run --token eyJhIjoiODA3NzcxNjBhOTEwMDFhNWVkMGZkMDQyMTA3NWU3YTQiLCJ0IjoiNjhjNzI2YjctNGQ5Mi00MDk2LTg3ZmYtNzM4YjkxOGJiMGUwIiwicyI6IllqUm1PRGhrTXpVdE9UZGpaUzAwTmprMkxXSTNaV1F0TkdWa1lUQTVOMlUwTkRReSJ9
-    networks:
-      - jellyfin-net
+    command: tunnel --no-autoupdate run --token eyJhIjoiODA3NzcxNjBhOTEwMDFhNWVkMGZkMDQyMTA3NWU3YTQiLCJ0IjoiMzNhZTcyMDUtZDViMy00OThmLTg4ZDUtOTJlN2E3ZDg0YzdjIiwicyI6IlltTXdZakU1T0RZdE16WXdOUzAwTldVd0xXRTVNakl0TkRsa09ETTVORGszTkRabCJ9
     restart: unless-stopped
+      
+############################
